@@ -1,9 +1,5 @@
-/* Estilos para TodoList - CSS puro sin Tailwind */
 
-/* Importación de fuentes */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Variables globales para fácil personalización */
 :root {
   --primary-color: #6366f1;
   --primary-light: #818cf8;
@@ -23,7 +19,7 @@
   --border-radius: 1rem;
 }
 
-/* Animaciones */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -35,7 +31,7 @@
   100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
 }
 
-/* Estilos base */
+
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
@@ -53,7 +49,7 @@ body {
   padding: 1rem;
 }
 
-/* Tarjeta principal */
+
 .todo-card {
   width: 100%;
   max-width: 500px;
@@ -70,7 +66,7 @@ body {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
-/* Título */
+
 .todo-title {
   font-size: 1.75rem;
   font-weight: 700;
@@ -79,7 +75,7 @@ body {
   color: var(--primary-dark);
 }
 
-/* Mensaje de error */
+
 .error-message {
   background-color: #fee2e2;
   border-left: 4px solid var(--danger-color);
@@ -105,7 +101,7 @@ body {
   color: var(--danger-dark);
 }
 
-/* Contenedor de input */
+
 .input-container {
   position: relative;
   margin-bottom: 1.5rem;
@@ -142,7 +138,7 @@ body {
   font-size: 0.875rem;
 }
 
-/* Indicador de carga */
+
 .loading-container {
   display: flex;
   justify-content: center;
@@ -185,7 +181,7 @@ body {
   color: var(--gray-500);
 }
 
-/* Elementos de la lista */
+
 .task-item {
   display: flex;
   justify-content: space-between;
@@ -227,7 +223,7 @@ body {
   transform: scale(0.95);
 }
 
-/* Botón para limpiar todas las tareas */
+
 .clear-btn-container {
   text-align: center;
 }
@@ -260,7 +256,7 @@ body {
   margin-right: 0.5rem;
 }
 
-/* Texto de pie de página */
+
 .footer-text {
   text-align: center;
   margin-top: 1.5rem;
@@ -268,7 +264,7 @@ body {
   color: var(--gray-500);
 }
 
-/* Responsive */
+
 @media (max-width: 640px) {
   .todo-card {
     width: 95%;

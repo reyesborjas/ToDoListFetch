@@ -13,25 +13,17 @@ export default function ToDoList() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Cargar tareas al iniciar
+    
     fetchTasks();
   }, []);
 
-  // Función para obtener las tareas del usuario
-  // Como no hay un endpoint específico en la documentación para obtener todas las tareas,
-  // esta función es un placeholder y deberíamos consultar si existe un endpoint para listar tareas
   const fetchTasks = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // En este punto, deberíamos hacer una llamada para obtener la lista de tareas
-      // Como no vemos un endpoint específico en la documentación, podemos establecer
-      // un array vacío por ahora
       setTasks([]);
       
-      // Nota: La API parece no tener un endpoint para listar todas las tareas de un usuario
-      // Idealmente, deberíamos tener algo como GET /todos/{user_name} pero no lo vemos en la documentación
     } catch (error) {
       console.error("Error fetching tasks:", error);
       setError("Error al cargar las tareas. Por favor, intenta nuevamente.");
@@ -40,12 +32,12 @@ export default function ToDoList() {
     }
   };
 
-  // Función para añadir una nueva tarea
+  
   const addTask = async (taskText) => {
     try {
       setLoading(true);
       
-      // Crear la tarea utilizando POST /todos/{user_name}
+    
       const response = await fetch(`${API_URL}/${USER_NAME}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -62,7 +54,7 @@ export default function ToDoList() {
       const newTaskData = await response.json();
       console.log("Task created:", newTaskData);
       
-      // Añadir la nueva tarea al estado
+    
       setTasks(prevTasks => [...prevTasks, newTaskData]);
       
       return newTaskData;
@@ -75,10 +67,10 @@ export default function ToDoList() {
     }
   };
 
-  // Función para actualizar una tarea existente
+
   const updateTask = async (taskId, updatedData) => {
     try {
-      // Actualizar la tarea utilizando PUT /todos/{todo_id}
+   
       const response = await fetch(`${API_URL}/${taskId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -92,7 +84,7 @@ export default function ToDoList() {
       const updatedTaskData = await response.json();
       console.log("Task updated:", updatedTaskData);
       
-      // Actualizar la tarea en el estado
+    
       setTasks(prevTasks => 
         prevTasks.map(task => 
           task.id === taskId ? updatedTaskData : task
@@ -107,10 +99,10 @@ export default function ToDoList() {
     }
   };
 
-  // Función para eliminar una tarea
+
   const deleteTask = async (taskId) => {
     try {
-      // Eliminar la tarea utilizando DELETE /todos/{todo_id}
+
       const response = await fetch(`${API_URL}/${taskId}`, {
         method: "DELETE"
       });
@@ -119,7 +111,7 @@ export default function ToDoList() {
         throw new Error(`Error: ${response.status}`);
       }
       
-      // Eliminar la tarea del estado
+    
       setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
       
       return true;
@@ -130,17 +122,17 @@ export default function ToDoList() {
     }
   };
 
-  // Manejador para añadir nueva tarea
+
   const handleNewTask = async (event) => {
     if (event.key === "Enter" && newTask.trim() !== "") {
       const taskText = newTask.trim();
-      setNewTask(""); // Limpiar input inmediatamente
+      setNewTask(""); 
       
       await addTask(taskText);
     }
   };
 
-  // Manejador para marcar tarea como completada/pendiente
+
   const handleToggleTask = async (task) => {
     const updatedData = {
       label: task.label,
@@ -150,22 +142,21 @@ export default function ToDoList() {
     await updateTask(task.id, updatedData);
   };
 
-  // Manejador para eliminar tarea
+  
   const handleDeleteTask = async (taskId) => {
     await deleteTask(taskId);
   };
 
-  // No hay un endpoint para eliminar todas las tareas de un usuario,
-  // así que implementamos una función que elimina las tareas una por una
+  
   const clearAllTasks = async () => {
     setLoading(true);
     
     try {
-      // Eliminar cada tarea individualmente
+     
       const deletePromises = tasks.map(task => deleteTask(task.id));
       await Promise.all(deletePromises);
       
-      // Limpiar el estado
+     
       setTasks([]);
     } catch (error) {
       console.error("Error clearing tasks:", error);
