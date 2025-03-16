@@ -1,0 +1,130 @@
+/* Custom CSS para TodoList */
+
+/* Importación de fuentes */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Variables globales */
+:root {
+  --primary-color: #6366f1;
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  --text-color: #334155;
+  --background-light: #f9fafc;
+  --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos base */
+.font-todo {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+/* Estilo para la lista de tareas */
+.task-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) var(--background-light);
+}
+
+.task-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-list::-webkit-scrollbar-track {
+  background: var(--background-light);
+  border-radius: 10px;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+  background-color: var(--primary-light);
+  border-radius: 10px;
+}
+
+/* Estilo para cada item de tarea */
+.task-item {
+  animation: fadeIn 0.3s ease-out;
+  border-left: 3px solid var(--primary-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task-item:hover {
+  transform: translateX(3px);
+}
+
+/* Estilos para botones */
+button {
+  transition: all 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Efecto de carga */
+.loading-shimmer {
+  background: linear-gradient(
+    to right,
+    #f6f7f8 8%,
+    #edeef1 18%,
+    #f6f7f8 33%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Estilo para la tarjeta principal */
+.todo-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.todo-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Efecto de pulso para botón de acción */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+.pulse-effect:focus {
+  animation: pulse 1.5s infinite;
+}
+
+/* Tema oscuro (opcional) */
+@media (prefers-color-scheme: dark) {
+  .dark-mode .task-item {
+    background-color: #1f2937;
+    color: #f9fafb;
+  }
+  
+  .dark-mode .todo-card {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+}
+
+/* Animación para tareas completadas */
+.completed-task {
+  text-decoration: line-through;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .todo-responsive-card {
+    width: 95%;
+    margin: 0 auto;
+  }
+}
