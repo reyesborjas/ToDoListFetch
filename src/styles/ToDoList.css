@@ -1,21 +1,26 @@
-/* Custom CSS para TodoList */
+/* Estilos para TodoList - CSS puro sin Tailwind */
 
 /* Importación de fuentes */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Variables globales */
+/* Variables globales para fácil personalización */
 :root {
   --primary-color: #6366f1;
   --primary-light: #818cf8;
   --primary-dark: #4f46e5;
   --text-color: #334155;
   --background-light: #f9fafc;
+  --danger-color: #ef4444;
+  --danger-dark: #b91c1c;
+  --success-color: #10b981;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --white: #ffffff;
   --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-/* Estilos base */
-.font-todo {
-  font-family: 'Poppins', sans-serif;
+  --border-radius: 1rem;
 }
 
 /* Animaciones */
@@ -24,13 +29,138 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
 }
 
-/* Estilo para la lista de tareas */
+/* Estilos base */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+}
+
+/* Contenedor principal */
+.todo-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #eff6ff, #e0e7ff);
+  padding: 1rem;
+}
+
+/* Tarjeta principal */
+.todo-card {
+  width: 100%;
+  max-width: 500px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 4px solid var(--primary-color);
+}
+
+.todo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Título */
+.todo-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-dark);
+}
+
+/* Mensaje de error */
+.error-message {
+  background-color: #fee2e2;
+  border-left: 4px solid var(--danger-color);
+  color: var(--danger-color);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-close-btn {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.error-close-btn:hover {
+  color: var(--danger-dark);
+}
+
+/* Contenedor de input */
+.input-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.task-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  padding-right: 8rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.task-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.task-input:focus {
+  animation: pulse 2s infinite;
+}
+
+.input-hint {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 0.875rem;
+}
+
+/* Indicador de carga */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.spinner-icon {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+/* Lista de tareas */
 .task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  max-height: 300px;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--primary-light) var(--background-light);
 }
@@ -49,82 +179,103 @@
   border-radius: 10px;
 }
 
-/* Estilo para cada item de tarea */
+.empty-list-message {
+  text-align: center;
+  padding: 1rem;
+  color: var(--gray-500);
+}
+
+/* Elementos de la lista */
 .task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--gray-100);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
   animation: fadeIn 0.3s ease-out;
+  transition: all 0.2s ease;
   border-left: 3px solid var(--primary-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .task-item:hover {
+  background-color: var(--gray-200);
   transform: translateX(3px);
 }
 
-/* Estilos para botones */
-button {
+.task-text {
+  color: var(--text-color);
+}
+
+.delete-btn {
+  color: var(--danger-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 9999px;
   transition: all 0.2s ease;
 }
 
-button:active {
+.delete-btn:hover {
+  color: var(--danger-dark);
+  background-color: #fee2e2;
+}
+
+.delete-btn:active {
   transform: scale(0.95);
 }
 
-/* Efecto de carga */
-.loading-shimmer {
-  background: linear-gradient(
-    to right,
-    #f6f7f8 8%,
-    #edeef1 18%,
-    #f6f7f8 33%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite linear;
+/* Botón para limpiar todas las tareas */
+.clear-btn-container {
+  text-align: center;
 }
 
-/* Estilo para la tarjeta principal */
-.todo-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.clear-all-btn {
+  background-color: var(--danger-color);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  transition: all 0.2s ease;
 }
 
-.todo-card:hover {
-  transform: translateY(-5px);
+.clear-all-btn:hover {
+  background-color: var(--danger-dark);
 }
 
-/* Efecto de pulso para botón de acción */
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+.clear-all-btn:active {
+  transform: scale(0.95);
 }
 
-.pulse-effect:focus {
-  animation: pulse 1.5s infinite;
+.sync-icon {
+  margin-right: 0.5rem;
 }
 
-/* Tema oscuro (opcional) */
-@media (prefers-color-scheme: dark) {
-  .dark-mode .task-item {
-    background-color: #1f2937;
-    color: #f9fafb;
+/* Texto de pie de página */
+.footer-text {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .todo-card {
+    width: 95%;
+    padding: 1.5rem;
   }
   
-  .dark-mode .todo-card {
-    background-color: #111827;
-    color: #f9fafb;
-  }
-}
-
-/* Animación para tareas completadas */
-.completed-task {
-  text-decoration: line-through;
-  opacity: 0.7;
-  transition: all 0.3s ease;
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  .todo-responsive-card {
-    width: 95%;
-    margin: 0 auto;
+  .task-input {
+    padding-right: 7rem;
   }
 }

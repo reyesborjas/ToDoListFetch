@@ -3,11 +3,8 @@ import '../../styles/ToDoList.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faSpinner, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
-// En tu JSX:
-<FontAwesomeIcon icon={faTrash} />
-
 const USER_NAME = "reyesborjas86";
-const API_URL = `https://playground.4geeks.com/todo/todos/${USER_NAME}`;
+const API_URL = `https://playground.4geeks.com/todo/todos`;
 
 export default function ToDoList() {
   const [tasks, setTasks] = useState([]);
@@ -16,191 +13,236 @@ export default function ToDoList() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Cargar tareas al iniciar
     fetchTasks();
   }, []);
 
+  // Función para obtener las tareas del usuario
+  // Como no hay un endpoint específico en la documentación para obtener todas las tareas,
+  // esta función es un placeholder y deberíamos consultar si existe un endpoint para listar tareas
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_URL);
+      setError(null);
       
-      if (response.status === 404) {
-        // If user doesn't exist, create a new user with empty todos
-        await createUser();
-        setTasks([]);
-        setLoading(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setTasks(data.map(task => task.label));
+      // En este punto, deberíamos hacer una llamada para obtener la lista de tareas
+      // Como no vemos un endpoint específico en la documentación, podemos establecer
+      // un array vacío por ahora
+      setTasks([]);
+      
+      // Nota: La API parece no tener un endpoint para listar todas las tareas de un usuario
+      // Idealmente, deberíamos tener algo como GET /todos/{user_name} pero no lo vemos en la documentación
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      setError("Failed to load tasks. Please try again.");
+      setError("Error al cargar las tareas. Por favor, intenta nuevamente.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Create a new user if the user doesn't exist
-  const createUser = async () => {
+  // Función para añadir una nueva tarea
+  const addTask = async (taskText) => {
     try {
-      // Example from documentation uses an empty array for new users
-      const response = await fetch(API_URL, {
+      setLoading(true);
+      
+      // Crear la tarea utilizando POST /todos/{user_name}
+      const response = await fetch(`${API_URL}/${USER_NAME}`, {
         method: "POST",
-        body: JSON.stringify([]),
-        headers: {
-          "Content-Type": "application/json"
-        }
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          label: taskText,
+          is_done: false
+        })
       });
-
-      if (!response.ok) {
-        throw new Error(`Error creating user: ${response.status}`);
-      }
-      
-      console.log(response.ok); // Will be true if the response is successful
-      console.log(response.status); // The status code=201 or code=400 etc.
-      
-      return response.json(); // As shown in the documentation example
-    } catch (error) {
-      console.error("Error creating user:", error);
-      setError("Failed to create user. Please try again.");
-    }
-  };
-
-  const updateTasksOnServer = async (updatedTasks) => {
-    try {
-      // Convert simple string tasks to the format expected by the API
-      const tasksForAPI = updatedTasks.map(task => ({
-        label: task,
-        done: false
-      }));
-
-      // Following the documentation example structure
-      const response = await fetch(API_URL, {
-        method: "PUT",
-        body: JSON.stringify(tasksForAPI),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      console.log(response.ok); // Will be true if the response is successful
-      console.log(response.status); // The status code=200 or code=400 etc.
       
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
       
-      return response.json()
-        .then(data => {
-          // Here is where your code should start after the fetch finishes
-          console.log(data); // This will print on the console the exact object received from the server
-        });
+      const newTaskData = await response.json();
+      console.log("Task created:", newTaskData);
+      
+      // Añadir la nueva tarea al estado
+      setTasks(prevTasks => [...prevTasks, newTaskData]);
+      
+      return newTaskData;
     } catch (error) {
-      console.error("Error updating tasks:", error);
-      setError("Failed to update tasks. Please try again.");
-      fetchTasks();
+      console.error("Error adding task:", error);
+      setError("Error al añadir la tarea. Por favor, intenta nuevamente.");
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Función para actualizar una tarea existente
+  const updateTask = async (taskId, updatedData) => {
+    try {
+      // Actualizar la tarea utilizando PUT /todos/{todo_id}
+      const response = await fetch(`${API_URL}/${taskId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const updatedTaskData = await response.json();
+      console.log("Task updated:", updatedTaskData);
+      
+      // Actualizar la tarea en el estado
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId ? updatedTaskData : task
+        )
+      );
+      
+      return updatedTaskData;
+    } catch (error) {
+      console.error("Error updating task:", error);
+      setError("Error al actualizar la tarea. Por favor, intenta nuevamente.");
+      return null;
+    }
+  };
+
+  // Función para eliminar una tarea
+  const deleteTask = async (taskId) => {
+    try {
+      // Eliminar la tarea utilizando DELETE /todos/{todo_id}
+      const response = await fetch(`${API_URL}/${taskId}`, {
+        method: "DELETE"
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      // Eliminar la tarea del estado
+      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+      
+      return true;
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      setError("Error al eliminar la tarea. Por favor, intenta nuevamente.");
+      return false;
+    }
+  };
+
+  // Manejador para añadir nueva tarea
   const handleNewTask = async (event) => {
     if (event.key === "Enter" && newTask.trim() !== "") {
-      const updatedTasks = [...tasks, newTask.trim()];
-      setTasks(updatedTasks);
-      setNewTask("");
-      await updateTasksOnServer(updatedTasks);
+      const taskText = newTask.trim();
+      setNewTask(""); // Limpiar input inmediatamente
+      
+      await addTask(taskText);
     }
   };
 
-  const handleDeleteTask = async (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
-    await updateTasksOnServer(updatedTasks);
+  // Manejador para marcar tarea como completada/pendiente
+  const handleToggleTask = async (task) => {
+    const updatedData = {
+      label: task.label,
+      is_done: !task.is_done
+    };
+    
+    await updateTask(task.id, updatedData);
   };
 
+  // Manejador para eliminar tarea
+  const handleDeleteTask = async (taskId) => {
+    await deleteTask(taskId);
+  };
+
+  // No hay un endpoint para eliminar todas las tareas de un usuario,
+  // así que implementamos una función que elimina las tareas una por una
   const clearAllTasks = async () => {
+    setLoading(true);
+    
     try {
-      // Using DELETE method as specified in the documentation to remove the user
-      const response = await fetch(API_URL, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      setTasks([]);
+      // Eliminar cada tarea individualmente
+      const deletePromises = tasks.map(task => deleteTask(task.id));
+      await Promise.all(deletePromises);
       
-      // Recreate the user with an empty todos array after deletion
-      await createUser();
+      // Limpiar el estado
+      setTasks([]);
     } catch (error) {
       console.error("Error clearing tasks:", error);
-      setError("Failed to clear tasks. Please try again.");
-      fetchTasks();
+      setError("Error al eliminar todas las tareas. Por favor, intenta nuevamente.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Función para refrescar la lista de tareas
+  const refreshTasks = () => {
+    fetchTasks();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex justify-center items-center font-todo">
-      <div className="w-full max-w-md p-6 bg-white shadow-xl rounded-2xl border-t-4 border-indigo-500 transition-all hover:shadow-2xl">
-        <h1 className="text-2xl font-bold text-center mb-6 text-indigo-700">To Do List</h1>
+    <div className="todo-container">
+      <div className="todo-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h1 className="todo-title">To Do List</h1>
+          <button onClick={refreshTasks} className="delete-btn" style={{ background: 'none', border: 'none' }}>
+            <FontAwesomeIcon icon={faSyncAlt} />
+          </button>
+        </div>
         
         {error && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded flex justify-between items-center">
+          <div className="error-message">
             <p>{error}</p>
             <button 
               onClick={() => setError(null)}
-              className="text-red-500 hover:text-red-700"
+              className="error-close-btn"
             >
               ×
             </button>
           </div>
         )}
         
-        <div className="relative mb-6">
+        <div className="input-container">
           <input
             type="text"
-            className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-gray-400"
+            className="task-input"
             placeholder="Agregar una nueva tarea..."
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             onKeyDown={handleNewTask}
           />
-          <span className="absolute right-3 top-3 text-gray-400 text-sm">Presiona Enter</span>
+          <span className="input-hint">Presiona Enter</span>
         </div>
         
         {loading ? (
-          <div className="flex justify-center my-8">
-            {/* Font Awesome spinner */}
-            <i className="fas fa-spinner fa-spin text-indigo-500 text-2xl"></i>
+          <div className="loading-container">
+            <FontAwesomeIcon icon={faSpinner} spin className="spinner-icon" />
           </div>
         ) : (
           <>
-            <ul className="space-y-2 mb-6 max-h-80 overflow-y-auto task-list">
+            <ul className="task-list">
               {tasks.length === 0 ? (
-                <li className="text-gray-500 text-center py-4">No hay tareas, agrega una nueva</li>
+                <li className="empty-list-message">No hay tareas, agrega una nueva</li>
               ) : (
-                tasks.map((task, index) => (
+                tasks.map(task => (
                   <li
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all task-item"
+                    key={task.id}
+                    className={`task-item ${task.is_done ? 'task-completed' : ''}`}
                   >
-                    <span className="text-gray-800">{task}</span>
+                    <div 
+                      className="task-text"
+                      onClick={() => handleToggleTask(task)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {task.label}
+                      {task.is_done && <span className="task-done-mark"> ✓</span>}
+                    </div>
                     <button
-                      onClick={() => handleDeleteTask(index)}
-                      className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-all"
+                      onClick={() => handleDeleteTask(task.id)}
+                      className="delete-btn"
                       aria-label="Delete task"
                     >
-                      {/* Font Awesome trash icon */}
-                      <i className="fas fa-trash-alt"></i>
+                      <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </li>
                 ))
@@ -208,13 +250,12 @@ export default function ToDoList() {
             </ul>
             
             {tasks.length > 0 && (
-              <div className="text-center">
+              <div className="clear-btn-container">
                 <button
                   onClick={clearAllTasks}
-                  className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex items-center justify-center mx-auto transition-all"
+                  className="clear-all-btn"
                 >
-                  {/* Font Awesome refresh icon */}
-                  <i className="fas fa-sync-alt mr-2"></i>
+                  <FontAwesomeIcon icon={faSyncAlt} className="sync-icon" />
                   Limpiar Todas las Tareas
                 </button>
               </div>
@@ -222,8 +263,8 @@ export default function ToDoList() {
           </>
         )}
         
-        <div className="text-center text-xs text-gray-500 mt-6">
-          <p>Tareas guardadas en la nube</p>
+        <div className="footer-text">
+          <p>Tareas: {tasks.length} - Guardadas en la nube</p>
         </div>
       </div>
     </div>
